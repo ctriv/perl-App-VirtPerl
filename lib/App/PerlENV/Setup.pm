@@ -5,7 +5,7 @@ use Config;
 use lib ();
 
 sub import {
-	my $current = "$ENV{PERLENV_ROOT}/current/lib/perl5";
+	my $current = "$ENV{PERLENV_ROOT}/$ENV{PERLENV_CURRENT_ENV}/lib/perl5";
 	
 	if (-e $current) {
 		@INC = grep {
