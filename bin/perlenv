@@ -1,0 +1,130 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+my $app = __PACKAGE__->new();
+$app->run(shift);
+
+=head1 NAME
+
+App::PerlENV - Insert Abstract Here
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=cut
+
+sub new {
+	my ($class, $arg) = @_;
+	
+	my $self = bless {
+		root => $ENV{PERLENV_ROOT} || "$ENV{HOME}/.perlenv"
+	};
+	
+	$self->init_system();
+	return $self;
+}
+
+sub run {
+	my ($self, $env) = @_;
+	
+	if (!$env) {
+		die "Usage: perlenv envname\n";
+	}
+	
+	unless ($self->env_exists($env)) {
+		$self->bootstrap_env($env);
+	}
+	
+	$self->switch_to_env($env);
+}
+
+sub init_system {
+	my ($self) = @_;
+	
+	return if -d $self->{root};
+	
+	$self->mkdir($self->{root});
+	my $shell_script = "export PERLENV_ROOT=$self->{root}\n" . <<'END';
+export PERL5OPT="-MApp::PerlENV::Setup ${PERL5OPT#-MApp::PerlENV::Setup}"
+export PATH=$PERLENV_ROOT/current/bin:${PATH#$PERLENV_ROOT/current/bin:}
+export PERL_CPANM_OPT="-L$PERLENV_ROOT/current ${PERL_CPANM_OPT#-L$PERLENV_ROOT/current}"
+current_perlenv() {
+	if [ -d $PERLENV_ROOT/current ]; then
+		local env=`basename $(readlink $PERLENV_ROOT/current)`
+		echo "($env)";
+	else
+		echo ""
+	fi	
+}
+export PS1="\$(current_perlenv)${PS1#$\(current_perlenv)}"
+
+
+unperlenv() {
+	export PERL5OPT=${PERL5OPT#-MApp::PerlENV::Setup}
+	export PATH=${PATH#$PERLENV_ROOT/current/bin:}
+	export PERL_CPANM_OPT=${PERL_CPANM_OPT#-L$PERLENV_ROOT/current}
+	rm $PERLENV_ROOT/current
+}
+END
+
+	$self->write_file("$self->{root}/perlenv.sh", $shell_script);
+
+	print <<END;
+You should include $self->{root}/perlenv.sh in your shell to finish setting up
+perlenv:
+
+	. $self->{root}/perlenv.sh
+	
+
+END
+}
+
+
+sub env_exists {
+	my ($self, $env) = @_;
+	
+	return -d "$self->{root}/$env";
+}
+
+
+sub bootstrap_env {
+	my ($self, $env) = @_;
+	
+	my $dir = "$self->{root}/$env";
+	$self->mkdir($dir);
+	$self->mkdir("$dir/lib");
+	$self->mkdir("$dir/bin");
+}
+
+
+sub switch_to_env {
+	my ($self, $env) = @_;
+	
+	unlink("$self->{root}/current");
+	symlink("$self->{root}/$env", "$self->{root}/current") || die "Couldn't symlink $self->{root}/$env to $self->{root}/current: $!\n";
+}
+
+
+sub mkdir {
+	my ($self, $dir) = @_;
+	CORE::mkdir($dir) || do {
+		die "Couldn't mkdir $dir: $!\n" unless $! =~ m/exists/;
+	};
+}
+
+sub write_file {
+	my ($self, $file, $body) = @_;
+	
+	open(my $fh, '>', $file) || die "Couldn't open $file for writing: $!\n";
+	print $fh $body;
+	close($fh) || die "Couldn't close $file: $!\n";
+}
+
+
+1;
+__END__
+
+
