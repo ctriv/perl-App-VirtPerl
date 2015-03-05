@@ -4,7 +4,7 @@
 use Test::More tests => 1;
 
 BEGIN {
-	use_ok('App::PerlENV');
+	use_ok('App::VirtPerl');
 }
 
 

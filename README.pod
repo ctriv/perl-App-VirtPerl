@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-App::PerlENV - Insert Abstract Here
+App::VirtPerl - Insert Abstract Here
 
 =head1 VERSION
 

@@ -1,4 +1,4 @@
-package App::PerlENV;
+package App::VirtPerl;
 
 use strict;
 use warnings;
@@ -7,7 +7,7 @@ use App::cpanminus;
 
 =head1 NAME
 
-App::PerlENV - Insert Abstract Here
+App::VirtPerl - Insert Abstract Here
 
 =head1 SYNOPSIS
 

@@ -1,11 +1,13 @@
-package App::PerlENV::Setup;
+package App::VirtPerl::Setup;
 
 use strict;
 use Config;
 use lib ();
 
 sub import {
-	my $current = "$ENV{PERLENV_ROOT}/$ENV{PERLENV_CURRENT_ENV}/lib/perl5";
+	return unless $ENV{PERL_VIRTPERL_ROOT} && $ENV{PERL_VIRTPERL_CURRENT_ENV};
+	
+	my $current = "$ENV{PERL_VIRTPERL_ROOT}/$ENV{PERL_VIRTPERL_CURRENT_ENV}/lib/perl5";
 	
 	if (-e $current) {
 		@INC = grep {
