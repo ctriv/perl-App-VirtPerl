@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 use File::Path 2.00 qw(make_path remove_tree);
+use File::Find;
 
 my ($action, @args) = @ARGV;
 
@@ -62,7 +63,29 @@ sub remove {
     
 }
 
+
+sub mkcpanfile {
+    my $current = $ENV{PERL_VIRTPERL_CURRENT_ENV};
+    
+    if (!$current) {
+        die "An env must be in use for mkcpandir\n";
+    }
+    
+    my $vistor = sub {
+        return unless -f && s/\.(tar\.gz|tar\.bz2?|tgz|zip)$//;
+        my ($name, $version) = m/(.*)-(.*)/;
+        
+        print "requires '$name', '$version';\n";
+    };
+    
+    find(
+        $vistor,
+        "$ENV{PERL_VIRTPERL_ROOT}/$current/dists"
+    );
+    
+}
+
 sub usage {
-    die "Usage: virtperl <create|use|off>\n";
+    die "Usage: virtperl <create|use|remove|off|mkcpanfile>\n";
 }
 

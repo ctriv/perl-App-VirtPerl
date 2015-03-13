@@ -38,10 +38,10 @@ ORIG_PS1=$PS1
 function virtperl () {
     case "$1" in
         use)
-            _virtperl_use $1
+            _virtperl_use $2
             ;;
         off)
-            _virtperl_off $1
+            _virtperl_off $2
             ;;
         *)
             _virtperl_tool $@
@@ -56,7 +56,7 @@ function _virtperl_use() {
     else 
         export PERL5OPT="-MApp::VirtPerl::Setup ${PERL5OPT#-MApp::VirtPerl::Setup}"
         export PATH=$PERL_VIRTPERL_ROOT/$1/bin:${PATH#$PERL_VIRTPERL_ROOT/$PERL_VIRTPERL_CURRENT_ENV/bin:}
-        export PERL_CPANM_OPT="-L$PERL_VIRTPERL_ROOT/$1 ${PERL_CPANM_OPT#-L$PERL_VIRTPERL_ROOT/$PERL_VIRTPERL_CURRENT_ENV}"
+        export PERL_CPANM_OPT="-L$PERL_VIRTPERL_ROOT/$1 --save-dists=$PERL_VIRTPERL_ROOT/$1/dists ${PERL_CPANM_OPT#-L$PERL_VIRTPERL_ROOT/$PERL_VIRTPERL_CURRENT_ENV --save-dists=$PERL_VIRTPERL_ROOT/$PERL_VIRTPERL_CURRENT_ENV/dists}"
         export PS1="($1)${PS1#\($PERL_VIRTPERL_CURRENT_ENV)}"
         export PERL_VIRTPERL_CURRENT_ENV=$1
     fi
@@ -65,7 +65,7 @@ function _virtperl_use() {
 function _virtperl_off() {
     export PERL5OPT=${PERL5OPT#-MApp::VirtPerl::Setup}
     export PATH=${PATH#$PERL_VIRTPERL_ROOT/$PERL_VIRTPERL_CURRENT_ENV/bin:}
-    export PERL_CPANM_OPT=${PERL_CPANM_OPT#-L$PERL_VIRTPERL_ROOT/$PERL_VIRTPERL_CURRENT_ENV}
+    export PERL_CPANM_OPT=${PERL_CPANM_OPT#-L$PERL_VIRTPERL_ROOT/$PERL_VIRTPERL_CURRENT_ENV --save-dists=$PERL_VIRTPERL_ROOT/$PERL_VIRTPERL_CURRENT_ENV/dists}
     unset  PERL_VIRTPERL_CURRENT_ENV
     export PS1=$ORIG_PS1
 }
