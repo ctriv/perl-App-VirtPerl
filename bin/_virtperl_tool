@@ -71,11 +71,21 @@ sub mkcpanfile {
         die "An env must be in use for mkcpandir\n";
     }
     
+    my %dists;
     my $vistor = sub {
         return unless -f && s/\.(tar\.gz|tar\.bz2?|tgz|zip)$//;
+        my $mtime = (stat($_))[9];
+        
         my ($name, $version) = m/(.*)-(.*)/;
         
-        print "requires '$name', '$version';\n";
+        # if there's no other version, or this version is newer than the other.
+        if (!$dists{$name} || $dists{$name}{mtime} < $mtime) {
+            $dists{$name} = {
+                name    => $name,
+                version => $version,
+                mtime   => $mtime,
+            };
+        }
     };
     
     find(
@@ -83,6 +93,9 @@ sub mkcpanfile {
         "$ENV{PERL_VIRTPERL_ROOT}/$current/dists"
     );
     
+    foreach my $name (sort { $a cmp $b } keys %dists) {
+        print "requires '$name', '$dists{$name}{version}';\n";
+    }
 }
 
 sub usage {
