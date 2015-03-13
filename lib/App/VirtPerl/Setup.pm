@@ -9,6 +9,12 @@ sub import {
 	
 	my $current = "$ENV{PERL_VIRTPERL_ROOT}/$ENV{PERL_VIRTPERL_CURRENT_ENV}/lib/perl5";
 	
+	if ($current !~ m:^([\w/.-]+)$:) {  # XXX got to figure this out 100% before release.
+		return;
+	}
+	
+	$current = $1;
+	
 	if (-e $current) {
 		@INC = grep {
 				   !m/^$Config{sitelibexp}/o
