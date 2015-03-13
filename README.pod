@@ -9,6 +9,7 @@ App::VirtPerl - Lightweight Environments
 version 0.1
 
 =head1 SYNOPSIS
+
    $ setup-virtperl
    $ . ~/.virtperl/virtperl.sh
    $ virtperl new project1

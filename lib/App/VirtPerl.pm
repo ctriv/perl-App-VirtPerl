@@ -10,6 +10,7 @@ use App::cpanminus;
 App::VirtPerl - Lightweight Environments
 
 =head1 SYNOPSIS
+
    $ setup-virtperl
    $ . ~/.virtperl/virtperl.sh
    $ virtperl new project1
