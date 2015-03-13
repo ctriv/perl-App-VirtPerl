@@ -1,0 +1,68 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use File::Path 2.00 qw(make_path remove_tree);
+
+my ($action, @args) = @ARGV;
+
+if (!$action) {
+    usage();
+}
+
+my $method = __PACKAGE__->can($action);
+
+if (!$method) {
+    usage();
+}
+
+$method->(@args);
+
+
+sub create {
+    my ($name) = @_;
+    
+    my $dir = "$ENV{PERL_VIRTPERL_ROOT}/$name";
+    
+    make_path("$dir/bin");
+    make_path("$dir/lib/perl5");
+    
+    print "$name env created.\n\n";
+}
+
+sub list {
+    my @envs = map { s:^.*/::; $_ } grep { -d } <"$ENV{PERL_VIRTPERL_ROOT}/*">;
+    
+    my $current = $ENV{PERL_VIRTPERL_CURRENT_ENV} || '';
+    foreach my $env (@envs) {
+        if ($env eq $current) {
+            print "* $env\n";
+        }
+        else {
+            print "  $env\n";
+        }
+    }
+    
+    print "\n";
+}
+
+sub remove {
+    my ($name) = @_;
+    my $dir = "$ENV{PERL_VIRTPERL_ROOT}/$name";
+    
+    my $current = $ENV{PERL_VIRTPERL_CURRENT_ENV} || '';
+    
+    if ($name eq $current) {
+        die "Please change to another env before removing $name\n";
+    }
+    
+    remove_tree($dir);
+    
+    print "$name removed\n\n"
+    
+}
+
+sub usage {
+    die "Usage: virtperl <create|use|off>\n";
+}
+

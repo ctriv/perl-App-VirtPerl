@@ -17,55 +17,68 @@ App::VirtPerl - Insert Abstract Here
 =cut
 
 sub new {
-	my ($class, $arg) = @_;
-	
-	my $self = bless {
-		root => $ENV{PERL_VIRTPERL_ROOT} || "$ENV{HOME}/.virtperl"
-	};
-	
-	return $self;
+    my ($class, $arg) = @_;
+    
+    my $self = bless {
+        root => $ENV{PERL_VIRTPERL_ROOT} || "$ENV{HOME}/.virtperl"
+    };
+    
+    return $self;
 }
 
 sub run {
-	my ($self) = @_;
-	
-	$self->mkdir($self->{root});
-	my $shell_script = "export PERL_VIRTPERL_ROOT=$self->{root}\n" . <<'END';
+    my ($self) = @_;
+    
+    $self->mkdir($self->{root});
+    my $shell_script = "export PERL_VIRTPERL_ROOT=$self->{root}\n" . <<'END';
 
 export PERL_VIRTPERL_CURRENT_ENV=''
 ORIG_PS1=$PS1
 
 function virtperl () {
-	local DIR="$PERL_VIRTPERL_ROOT/$1";
-	if [ ! -d $DIR ]; then
-		mkdir -p $DIR/bin
-		mkdir -p $DIR/lib/perl5
-	fi
-
-	export PERL5OPT="-MApp::VirtPerl::Setup ${PERL5OPT#-MApp::VirtPerl::Setup}"
-	export PATH=$PERL_VIRTPERL_ROOT/$1/bin:${PATH#$PERL_VIRTPERL_ROOT/$PERL_VIRTPERL_CURRENT_ENV/bin:}
-	export PERL_CPANM_OPT="-L$PERL_VIRTPERL_ROOT/$1 ${PERL_CPANM_OPT#-L$PERL_VIRTPERL_ROOT/$PERL_VIRTPERL_CURRENT_ENV}"
-	export PS1="($1)${PS1#\($PERL_VIRTPERL_CURRENT_ENV)}"
-	export PERL_VIRTPERL_CURRENT_ENV=$1
+    case "$1" in
+        use)
+            _virtperl_use $1
+            ;;
+        off)
+            _virtperl_off $1
+            ;;
+        *)
+            _virtperl_tool $@
+            ;;
+    esac
 }
 
-function realperl() {
-	export PERL5OPT=${PERL5OPT#-MApp::VirtPerl::Setup}
-	export PATH=${PATH#$PERL_VIRTPERL_ROOT/$PERL_VIRTPERL_CURRENT_ENV/bin:}
-	export PERL_CPANM_OPT=${PERL_CPANM_OPT#-L$PERL_VIRTPERL_ROOT/$PERL_VIRTPERL_CURRENT_ENV}
-	unset  PERL_VIRTPERL_CURRENT_ENV
-	export PS1=$ORIG_PS1
+function _virtperl_use() {
+    local DIR="$PERL_VIRTPERL_ROOT/$1";
+    if [ ! -d $DIR ]; then
+        echo "$1 is not a virtual perl env.  You can create it with virtperl create $1"
+    else 
+        export PERL5OPT="-MApp::VirtPerl::Setup ${PERL5OPT#-MApp::VirtPerl::Setup}"
+        export PATH=$PERL_VIRTPERL_ROOT/$1/bin:${PATH#$PERL_VIRTPERL_ROOT/$PERL_VIRTPERL_CURRENT_ENV/bin:}
+        export PERL_CPANM_OPT="-L$PERL_VIRTPERL_ROOT/$1 ${PERL_CPANM_OPT#-L$PERL_VIRTPERL_ROOT/$PERL_VIRTPERL_CURRENT_ENV}"
+        export PS1="($1)${PS1#\($PERL_VIRTPERL_CURRENT_ENV)}"
+        export PERL_VIRTPERL_CURRENT_ENV=$1
+    fi
+}
+
+function _virtperl_off() {
+    export PERL5OPT=${PERL5OPT#-MApp::VirtPerl::Setup}
+    export PATH=${PATH#$PERL_VIRTPERL_ROOT/$PERL_VIRTPERL_CURRENT_ENV/bin:}
+    export PERL_CPANM_OPT=${PERL_CPANM_OPT#-L$PERL_VIRTPERL_ROOT/$PERL_VIRTPERL_CURRENT_ENV}
+    unset  PERL_VIRTPERL_CURRENT_ENV
+    export PS1=$ORIG_PS1
 }
 END
 
-	$self->write_file("$self->{root}/virtperl.sh", $shell_script);
+    $self->write_file("$self->{root}/virtperl.sh", $shell_script);
 
-	print <<END;
+    print <<END;
 You should include $self->{root}/virtperl.sh in your shell to finish setting up
 virtperl:
 
-	. $self->{root}/virtperl.sh
-	
+    . $self->{root}/virtperl.sh
+    
 
 END
 }
@@ -73,18 +86,18 @@ END
 
 
 sub mkdir {
-	my ($self, $dir) = @_;
-	CORE::mkdir($dir) || do {
-		die "Couldn't mkdir $dir: $!\n" unless $! =~ m/exists/;
-	};
+    my ($self, $dir) = @_;
+    CORE::mkdir($dir) || do {
+        die "Couldn't mkdir $dir: $!\n" unless $! =~ m/exists/;
+    };
 }
 
 sub write_file {
-	my ($self, $file, $body) = @_;
-	
-	open(my $fh, '>', $file) || die "Couldn't open $file for writing: $!\n";
-	print $fh $body;
-	close($fh) || die "Couldn't close $file: $!\n";
+    my ($self, $file, $body) = @_;
+    
+    open(my $fh, '>', $file) || die "Couldn't open $file for writing: $!\n";
+    print $fh $body;
+    close($fh) || die "Couldn't close $file: $!\n";
 }
 
 
