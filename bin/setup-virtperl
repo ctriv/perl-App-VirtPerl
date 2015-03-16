@@ -54,9 +54,9 @@ function _virtperl_use() {
     if [ ! -d $DIR ]; then
         echo "$1 is not a virtual perl env.  You can create it with virtperl create $1"
     else 
-        export PERL5OPT="-MApp::VirtPerl::Setup ${PERL5OPT#-MApp::VirtPerl::Setup}"
+        export PERL5OPT="-MApp::VirtPerl::Setup ${PERL5OPT#-MApp::VirtPerl::Setup }"
         export PATH=$PERL_VIRTPERL_ROOT/$1/bin:${PATH#$PERL_VIRTPERL_ROOT/$PERL_VIRTPERL_CURRENT_ENV/bin:}
-        export PERL_CPANM_OPT="-L$PERL_VIRTPERL_ROOT/$1 ${PERL_CPANM_OPT#-L$PERL_VIRTPERL_ROOT/$PERL_VIRTPERL_CURRENT_ENV}"
+        export PERL_CPANM_OPT="-L$PERL_VIRTPERL_ROOT/$1 ${PERL_CPANM_OPT#-L$PERL_VIRTPERL_ROOT/$PERL_VIRTPERL_CURRENT_ENV }"
         export PS1="($1)${PS1#\($PERL_VIRTPERL_CURRENT_ENV)}"
         export PERL_VIRTPERL_CURRENT_ENV=$1
     fi
@@ -65,7 +65,7 @@ function _virtperl_use() {
 function _virtperl_off() {
     export PERL5OPT=${PERL5OPT#-MApp::VirtPerl::Setup}
     export PATH=${PATH#$PERL_VIRTPERL_ROOT/$PERL_VIRTPERL_CURRENT_ENV/bin:}
-    export PERL_CPANM_OPT=${PERL_CPANM_OPT#-L$PERL_VIRTPERL_ROOT/$PERL_VIRTPERL_CURRENT_ENV}
+    export PERL_CPANM_OPT=${PERL_CPANM_OPT#-L$PERL_VIRTPERL_ROOT/$PERL_VIRTPERL_CURRENT_ENV }
     unset  PERL_VIRTPERL_CURRENT_ENV
     export PS1=$ORIG_PS1
 }
