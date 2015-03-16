@@ -1,12 +1,6 @@
-=pod
-
 =head1 NAME
 
 virtperl - Virtual perl environments
-
-=head1 VERSION
-
-version 0.1
 
 =head1 SYNOPSIS
 
