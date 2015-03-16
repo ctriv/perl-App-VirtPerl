@@ -2,8 +2,12 @@
 
 use strict;
 use warnings;
+no  App::VirtPerl::Setup; # restore INC to outside the env.
+
 use File::Path 2.00 qw(make_path remove_tree);
-use File::Find;
+use Config;
+use JSON;
+
 
 my ($action, @args) = @ARGV;
 
@@ -71,30 +75,23 @@ sub mkcpanfile {
         die "An env must be in use for mkcpandir\n";
     }
     
-    my %dists;
-    my $vistor = sub {
-        return unless -f && s/\.(tar\.gz|tar\.bz2?|tgz|zip)$//;
-        my $mtime = (stat($_))[9];
-        
-        my ($name, $version) = m/(.*)-(.*)/;
-        
-        # if there's no other version, or this version is newer than the other.
-        if (!$dists{$name} || $dists{$name}{mtime} < $mtime) {
-            $dists{$name} = {
-                name    => $name,
-                version => $version,
-                mtime   => $mtime,
-            };
-        }
+    my $metadir = "$ENV{PERL_VIRTPERL_ROOT}/$current/lib/perl5/$Config{archname}/.meta";
+    
+    my $read_install_json = sub {
+        my $file = "$_/install.json";
+        open(my $fh, '<', $file) || die "Couldn't open $file: $!\n";
+        my $json = do {
+            local $/;
+            <$fh>
+        };
+        close($fh) || die "Couldn't close $file: $!\n";
+        return JSON::decode_json($json);
     };
     
-    find(
-        $vistor,
-        "$ENV{PERL_VIRTPERL_ROOT}/$current/dists"
-    );
+    my @dists = map { $read_install_json->() } sort glob("$metadir/*");
     
-    foreach my $name (sort { $a cmp $b } keys %dists) {
-        print "requires '$name', '$dists{$name}{version}';\n";
+    foreach my $meta (@dists) {
+        print "requires '$meta->{name}', '$meta->{version}';\n";
     }
 }
 

@@ -4,6 +4,10 @@ use strict;
 use Config;
 use lib ();
 
+
+my @original_inc;
+BEGIN { @original_inc = @INC };
+
 sub import {
 	return unless $ENV{PERL_VIRTPERL_ROOT} && $ENV{PERL_VIRTPERL_CURRENT_ENV};
 	
@@ -25,6 +29,10 @@ sub import {
 	
 		lib->import($current);
 	}
+}
+
+sub unimport {
+		@INC = @original_inc;
 }
 
 1;
