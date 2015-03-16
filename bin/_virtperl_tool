@@ -32,8 +32,9 @@ sub create {
     make_path("$dir/bin");
     make_path("$dir/lib/perl5");
     
-    print "$name env created.\n\n";
+    print "$name env created.\n";
 }
+sub new { &create }
 
 sub list {
     my @envs = map { s:^.*/::; $_ } grep { -d } <"$ENV{PERL_VIRTPERL_ROOT}/*">;
@@ -41,14 +42,12 @@ sub list {
     my $current = $ENV{PERL_VIRTPERL_CURRENT_ENV} || '';
     foreach my $env (@envs) {
         if ($env eq $current) {
-            print "* $env\n";
+            print " * $env\n";
         }
         else {
-            print "  $env\n";
+            print "   $env\n";
         }
     }
-    
-    print "\n";
 }
 
 sub remove {
@@ -63,9 +62,9 @@ sub remove {
     
     remove_tree($dir);
     
-    print "$name removed\n\n"
-    
+    print "$name removed\n"   
 }
+sub rm { &remove }
 
 
 sub mkcpanfile {
