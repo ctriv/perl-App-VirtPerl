@@ -62,6 +62,11 @@ function virtperl () {
 }
 
 function _virtperl_use() {
+    if [ "x$1" == "x" ]; then
+        echo "Usage: virtperl use <env name>";
+        return 1;
+    fi
+    
     local DIR="$PERL_VIRTPERL_ROOT/$1";
     if [ ! -d $DIR ]; then
         echo "$1 is not a virtual perl env.  You can create it with virtperl create $1"
