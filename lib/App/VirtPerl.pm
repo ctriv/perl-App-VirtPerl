@@ -7,13 +7,13 @@ use App::cpanminus;
 
 =head1 NAME
 
-App::VirtPerl - Lightweight Environments
+App::VirtPerl - Lightweight Perl Environments
 
 =head1 SYNOPSIS
 
    $ setup-virtperl
    $ . ~/.virtperl/virtperl.sh
-   $ virtperl new project1
+   $ virtperl create project1
    $ virtperl use project1
    $ cpanm Moose
 
@@ -44,7 +44,7 @@ LICENSE file included with this module.
 
 =head1 SEE ALSO
 
-L<App::perlbrew>, L<App::cpanminus>, virtualenv, perl(1)
+L<virtperl>, L<App::perlbrew>, L<App::cpanminus>, virtualenv, perl(1)
 
 =cut
 
