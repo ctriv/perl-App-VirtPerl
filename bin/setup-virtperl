@@ -86,6 +86,29 @@ function _virtperl_off() {
     unset  PERL_VIRTPERL_CURRENT_ENV
     export PS1=$ORIG_PS1
 }
+
+function _current_envs() {
+    ls -d $PERL_VIRTPERL_ROOT/*/ | xargs basename
+}
+
+function _complete_virtperl() {
+    local cur=${COMP_WORDS[COMP_CWORD]}
+    local prev=${COMP_WORDS[COMP_CWORD-1]}
+    
+    case "$prev" in
+        use|rm|remove)
+            COMPREPLY=($(compgen -W "$(_current_envs)" -- $cur));
+            ;;
+        virtperl)
+            COMPREPLY=($(compgen -W "create new use list mkcpanfile rm remove off" -- $cur));
+            ;;
+    esac
+    
+    return 0
+}
+
+complete -F _complete_virtperl virtperl
+
 END
 
     $self->write_file("$self->{root}/virtperl.sh", $shell_script);
