@@ -87,10 +87,20 @@ sub mkcpanfile {
         return JSON::decode_json($json);
     };
     
-    my @dists = map { $read_install_json->() } sort glob("$metadir/*");
-    
+    my @dists = map { $read_install_json->() } glob("$metadir/*");
+    my %newest_version;
     foreach my $meta (@dists) {
-        print "requires '$meta->{name}', '$meta->{version}';\n";
+        if ($newest_version{$meta->{name}}) {
+            if (version->parse($meta->{version}) > version->parse($newest_version{$meta->{name}})) {
+                $newest_version{$meta->{name}} = $meta->{version};
+            }
+        }
+        else {
+            $newest_version{$meta->{name}} = $meta->{version};
+        }
+    }
+    foreach my $name (sort keys %newest_version) {
+        print "requires '$name', '$newest_version{$name}';\n";
     }
 }
 
