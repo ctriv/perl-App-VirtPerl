@@ -28,6 +28,7 @@ enviroment starts with a clean slate.
 
 Tests.
 Documentation.
+Only bash is supported at the moment.
 
 =head1 AUTHORS
 

@@ -71,7 +71,7 @@ sub mkcpanfile {
     my $current = $ENV{PERL_VIRTPERL_CURRENT_ENV};
     
     if (!$current) {
-        die "An env must be in use for mkcpandir\n";
+        die "An env must be in use for mkcpanfile\n";
     }
     
     my $metadir = "$ENV{PERL_VIRTPERL_ROOT}/$current/lib/perl5/$Config{archname}/.meta";
